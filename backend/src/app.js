@@ -1,5 +1,6 @@
 import express from "express";
 import authRoutes from "./routes/authRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
 
 const app = express();
 
@@ -13,6 +14,9 @@ app.use("/api/auth", authRoutes);
 app.get("/", (req, res) => {
   res.send("Shopscale API running");
 });
+
+//Product Routes
+app.use("/api/products", productRoutes);
 
 export default app;
 
