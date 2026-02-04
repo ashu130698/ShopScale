@@ -1,4 +1,4 @@
-import { error } from "console";
+
 import Product from "../models/product.js";
 
 ///GET /api/products - Public - list all products
