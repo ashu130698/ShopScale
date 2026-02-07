@@ -12,7 +12,7 @@ import adminOnly from "../middleware/roleMiddleware.js";
 const router = express.Router();
 
 //public routes
-router.get("/getproducts", getProducts);
+router.get("/", getProducts);
 router.get("/:id", getProductById);
 
 //Admin routes

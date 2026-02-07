@@ -1,3 +1,4 @@
+import cors from "cors";
 import express from "express";
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
@@ -6,6 +7,8 @@ import orderRoutes from "./routes/orderRoutes.js";
 import errorHandler from "./middleware/errorMiddleware.js";
 
 const app = express();
+
+app.use(cors());
 
 //middleware
 app.use(express.json()); //parse json request body
