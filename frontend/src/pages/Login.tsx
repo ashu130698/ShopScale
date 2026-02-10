@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../api/axios";
 import { useState } from "react";
 
 function Login() {
@@ -9,17 +9,17 @@ function Login() {
         e.preventDefault();
 
         try {
-            const res = await axios.post("http://localhost:4000/api/auth/login", { email, password, });
+            const res = await api.post("/auth/login", { email, password });
 
             //store token
             localStorage.setItem("token", res.data.token);
-            window.location.reload();
             console.log("TOKEN:", res.data.token);
             alert("Login successful");
+            window.location.reload();
 
         } catch (error) {
             console.error(error);
-            alert("Invalid Credientials");
+            alert("Invalid Credentials");
         }
     };
     return (
