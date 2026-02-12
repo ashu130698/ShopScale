@@ -37,9 +37,28 @@ function Cart() {
     fetchCart();
   }, []);
 
+  const placeOrder = async () => {
+    try {
+      await api.post("/orders");
+      alert("Order placed succesfully");
+
+      //reload cart after order
+      window.location.reload();
+    } catch (error) {
+      console.error("Order failed", error);
+      alert("Could not place order");
+    }
+  };
+
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <h2>My Cart</h2>
         <button onClick={handleLogout}>Logout</button>
       </div>
@@ -52,10 +71,15 @@ function Cart() {
             {item.product.name} — Qty: {item.quantity}
           </div>
         ))
+      )};
+      {cart && cart.items?.length > 0 && (
+        <>
+          <br />
+          <button onClick={placeOrder}>Place Order</button>
+        </>
       )}
     </div>
   );
 }
 
 export default Cart;
-

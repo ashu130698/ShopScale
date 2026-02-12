@@ -12,8 +12,8 @@ function App() {
 
   return (
     <div>
-      <button onClick={() => setPage("home")}>Home</button>
-      <button onClick={() => setPage("cart")}>Cart</button>
+      <button onClick={() => setPage("home")}>Home</button> <br />
+      <button onClick={() => setPage("cart")}>Cart</button> <br />
       <button
         onClick={() => {
           localStorage.removeItem("token");
@@ -22,7 +22,6 @@ function App() {
       >
         Logout
       </button>
-
       {page === "home" && <Home />}
       {page === "cart" && <Cart />}
     </div>

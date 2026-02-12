@@ -24,6 +24,20 @@ function Home() {
     fetchProducts();
   }, []);
 
+  const addToCart = async (productId: string) => {
+    try {
+      await api.post("/cart", {
+        productId,
+        quantity: 1,
+      });
+
+      alert("Added to cart");
+    } catch (error) {
+      console.error("Added to cart failed", error);
+      alert("Could not add item");
+    }
+  };
+
   return (
     <div>
       <h1>Products</h1>
@@ -36,7 +50,11 @@ function Home() {
             <h3>{p.name}</h3>
             <p>{p.description}</p>
             <strong>₹{p.price}</strong>
-            <hr />
+
+            <br />
+            <br />
+
+            <button onClick={() => addToCart(p._id)}>Add To Cart</button>
           </div>
         ))
       )}
