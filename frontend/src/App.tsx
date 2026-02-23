@@ -1,34 +1,46 @@
-import { useState } from "react";
-import Login from "./pages/Login";
-import Cart from "./pages/Cart";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
-import Orders from "./pages/Orders";
+import Cart from "./pages/Cart";
+import Orders from "./pages/Order";
+import Login from "./pages/Login";
+
+const PrivateRoute = ({ children }: { children: JSX.Element }) => {
+  const token = localStorage.getItem("token");
+  return token ? children : <Navigate to="/login" />;
+};
 
 function App() {
-  const [page, setPage] = useState<"home" | "cart" | "orders" | "login">(
-    localStorage.getItem("token") ? "home" : "login",
-  );
-
-  if (page === "login") return <Login />;
-
   return (
-    <div>
-      <button onClick={() => setPage("home")}>Home</button> <br />
-      <button onClick={() => setPage("cart")}>Cart</button> <br />
-      <button onClick={() => setPage("orders")}>Orders</button>
-      <button
-        onClick={() => {
-          localStorage.removeItem("token");
-          window.location.reload();
-        }}
-      >
-        Logout
-      </button>
-      {/* render */}
-      {page === "home" && <Home />}
-      {page === "cart" && <Cart />}
-      {page === "orders" && <Orders />} render
-    </div>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+
+      <Route
+        path="/"
+        element={
+          <PrivateRoute>
+            <Home />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/cart"
+        element={
+          <PrivateRoute>
+            <Cart />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/orders"
+        element={
+          <PrivateRoute>
+            <Orders />
+          </PrivateRoute>
+        }
+      />
+    </Routes>
   );
 }
 
