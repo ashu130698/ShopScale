@@ -39,24 +39,29 @@ function Home() {
   };
 
   return (
-    <div>
-      <h1>Products</h1>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6">Products</h1>
 
       {products.length === 0 ? (
         <p>No products available</p>
       ) : (
-        products.map((p) => (
-          <div key={p._id}>
-            <h3>{p.name}</h3>
-            <p>{p.description}</p>
-            <strong>₹{p.price}</strong>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((p) => (
+            <div
+              key={p._id}
+              className="border rounded-lg p-4 shadow-sm hover:shadow-md transition"
+            >
+              <h3 className="text-lg font-semibold">{p.name}</h3>
+              <p className="text-gray-600 mt-2 min-h-[40px]">{p.description}</p>
 
-            <br />
-            <br />
+              <div className="mt-4 text-xl font-bold">₹{p.price}</div>
 
-            <button onClick={() => addToCart(p._id)}>Add To Cart</button>
-          </div>
-        ))
+              <br /><br />
+
+              <button onClick={() => addToCart(p._id)} className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Add To Cart</button>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

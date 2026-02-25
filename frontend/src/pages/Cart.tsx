@@ -19,11 +19,6 @@ interface CartData {
 function Cart() {
   const [cart, setCart] = useState<CartData | null>(null);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.reload();
-  };
-
   useEffect(() => {
     const fetchCart = async () => {
       try {
@@ -60,7 +55,6 @@ function Cart() {
         }}
       >
         <h2>My Cart</h2>
-        <button onClick={handleLogout}>Logout</button>
       </div>
 
       {!cart || cart.items?.length === 0 ? (
@@ -71,7 +65,7 @@ function Cart() {
             {item.product.name} — Qty: {item.quantity}
           </div>
         ))
-      )};
+      )}
       {cart && cart.items?.length > 0 && (
         <>
           <br />

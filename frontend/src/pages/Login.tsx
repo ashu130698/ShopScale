@@ -31,6 +31,9 @@ function Login() {
                 <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 
                 <button type="submit">Login</button>
+                <p>
+                    New user? <a href="/register">Create Account</a>
+                </p>
         </form>
       </div>
     );
