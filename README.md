@@ -81,6 +81,4 @@ shopscale/
 | GET | `/api/orders` | Get user's orders |
 | POST | `/api/orders` | Place an order |
 
-## License
 
-MIT
