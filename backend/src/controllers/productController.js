@@ -1,14 +1,24 @@
 
 import Product from "../models/product.js";
 
-///GET /api/products - Public - list all products
+/// GET /api/products - list or search products
 export const getProducts = async (req, res) => {
-    try {
-        const products = await Product.find();
-        res.json(products);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const keyword = req.query.keyword
+      ? {
+          name: {
+            $regex: req.query.keyword,
+            $options: "i", // case-insensitive
+          },
+        }
+      : {};
+
+    const products = await Product.find(keyword);
+
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 ///GET /api/product - Public - single product
