@@ -9,12 +9,13 @@ type Product = {
 };
 
 function Home() {
+  const [keyword, setKeyword] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await api.get("/products");
+        const res = await api.get(`/products?keyword=${keyword}`);
         setProducts(res.data);
       } catch (error) {
         console.error("Failed to fetch products", error);
@@ -22,7 +23,7 @@ function Home() {
     };
 
     fetchProducts();
-  }, []);
+  }, [keyword]);
 
   const addToCart = async (productId: string) => {
     try {
@@ -41,6 +42,13 @@ function Home() {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Products</h1>
+      <input
+        type="text"
+        placeholder="Search products..."
+        value={keyword}
+        onChange={(e) => setKeyword(e.target.value)}
+        className="border p-2 mb-6 w-full rounded"
+      />
 
       {products.length === 0 ? (
         <p>No products available</p>
@@ -56,9 +64,15 @@ function Home() {
 
               <div className="mt-4 text-xl font-bold">₹{p.price}</div>
 
-              <br /><br />
+              <br />
+              <br />
 
-              <button onClick={() => addToCart(p._id)} className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Add To Cart</button>
+              <button
+                onClick={() => addToCart(p._id)}
+                className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+              >
+                Add To Cart
+              </button>
             </div>
           ))}
         </div>
