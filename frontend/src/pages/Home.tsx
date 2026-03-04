@@ -9,13 +9,22 @@ type Product = {
 };
 
 function Home() {
-  const [keyword, setKeyword] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
+  const [keyword, setKeyword] = useState("");
+  const [debouncedKeyword, setDebouncedKeyword] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedKeyword(keyword);
+    }, 500); //wait 500ms after typing stops
+
+    return () => clearTimeout(timer);
+  }, [keyword]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await api.get(`/products?keyword=${keyword}`);
+        const res = await api.get(`/products?keyword=${debouncedKeyword}`);
         setProducts(res.data);
       } catch (error) {
         console.error("Failed to fetch products", error);
@@ -23,7 +32,7 @@ function Home() {
     };
 
     fetchProducts();
-  }, [keyword]);
+  }, [debouncedKeyword]);
 
   const addToCart = async (productId: string) => {
     try {
