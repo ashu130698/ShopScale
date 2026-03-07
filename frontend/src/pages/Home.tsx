@@ -10,6 +10,8 @@ type Product = {
 
 function Home() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
   const [keyword, setKeyword] = useState("");
   const [debouncedKeyword, setDebouncedKeyword] = useState("");
 
@@ -24,15 +26,18 @@ function Home() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await api.get(`/products?keyword=${debouncedKeyword}`);
-        setProducts(res.data);
+        const res = await api.get(
+          `/products?page=${page}&keyword=${debouncedKeyword}`,
+        );
+        setProducts(res.data.products);
+        setPages(res.data.pages);
       } catch (error) {
         console.error("Failed to fetch products", error);
       }
     };
 
     fetchProducts();
-  }, [debouncedKeyword]);
+  }, [page, debouncedKeyword]);
 
   const addToCart = async (productId: string) => {
     try {
@@ -62,29 +67,45 @@ function Home() {
       {products.length === 0 ? (
         <p>No products available</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((p) => (
-            <div
-              key={p._id}
-              className="border rounded-lg p-4 shadow-sm hover:shadow-md transition"
-            >
-              <h3 className="text-lg font-semibold">{p.name}</h3>
-              <p className="text-gray-600 mt-2 min-h-[40px]">{p.description}</p>
-
-              <div className="mt-4 text-xl font-bold">₹{p.price}</div>
-
-              <br />
-              <br />
-
-              <button
-                onClick={() => addToCart(p._id)}
-                className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {products.map((p) => (
+              <div
+                key={p._id}
+                className="border rounded-lg p-4 shadow-sm hover:shadow-md transition"
               >
-                Add To Cart
+                <h3 className="text-lg font-semibold">{p.name}</h3>
+                <p className="text-gray-600 mt-2 min-h-[40px]">
+                  {p.description}
+                </p>
+
+                <div className="mt-4 text-xl font-bold">₹{p.price}</div>
+
+                <button
+                  onClick={() => addToCart(p._id)}
+                  className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+                >
+                  Add To Cart
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Pagination */}
+          <div className="flex justify-center mt-8 gap-2">
+            {[...Array(pages).keys()].map((x) => (
+              <button
+                key={x + 1}
+                onClick={() => setPage(x + 1)}
+                className={`px-4 py-2 border rounded ${
+                  page === x + 1 ? "bg-black text-white" : "bg-white"
+                }`}
+              >
+                {x + 1}
               </button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

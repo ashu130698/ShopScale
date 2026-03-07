@@ -3,7 +3,10 @@ import Product from "../models/product.js";
 
 /// GET /api/products - list or search products
 export const getProducts = async (req, res) => {
-  try {
+    try {
+        const pageSize = 6;
+        const page = Number(req.query.page) || 1;
+
     const keyword = req.query.keyword
       ? {
           name: {
@@ -11,11 +14,15 @@ export const getProducts = async (req, res) => {
             $options: "i", // case-insensitive
           },
         }
-      : {};
+            : {};
+        
+        const count = await Product.countDocuments(keyword);
 
-    const products = await Product.find(keyword);
+        const products = await Product.find(keyword)
+            .limit(pageSize)
+            .skip(pageSize * (page - 1));
 
-    res.json(products);
+    res.json({products,page,pages: Math.ceil(count / pageSize)});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
