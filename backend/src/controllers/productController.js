@@ -69,14 +69,21 @@ export const updateProduct = async (req, res) => {
         const product = await Product.findById(req.params.id);
 
         if (!product) {
-            return res.status(505).json({ message: "Product Not Found" });
+            return res.status(404).json({ message: "Product Not Found" });
         }
 
-        ///update only provided shields
-        Object.assign(product, req.body);
+        const { name, description, price, category, stock, image } = req.body;
 
-        const updateProduct = await product.save();
-        res.json(updateProduct);
+        // Only update allowed fields
+        product.name = name || product.name;
+        product.description = description || product.description;
+        product.price = price != null ? price : product.price;
+        product.category = category || product.category;
+        product.stock = stock != null ? stock : product.stock;
+        product.image = image || product.image;
+
+        const updatedProduct = await product.save();
+        res.json(updatedProduct);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

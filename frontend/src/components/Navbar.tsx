@@ -12,24 +12,27 @@ function Navbar() {
     if (!token) return null;
 
    return (
-     <div className="flex justify-between items-center px-6 py-3 border-b bg-gray-100">
-       <div className="font-bold text-xl">ShopScale</div>
+     <nav className="sticky top-0 z-50 flex justify-between items-center px-8 py-4 border-b bg-white/80 backdrop-blur-md">
+       <div className="font-bold text-xl tracking-tight">ShopScale</div>
 
-       <div className="flex gap-6">
-         <Link to="/" className="hover:text-blue-600">
+       <div className="flex items-center gap-8">
+         <Link to="/" className="text-sm font-medium text-slate-600 hover:text-black transition-colors">
            Home
          </Link>
-         <Link to="/cart" className="hover:text-blue-600">
+         <Link to="/cart" className="text-sm font-medium text-slate-600 hover:text-black transition-colors">
            Cart
          </Link>
-         <Link to="/orders" className="hover:text-blue-600">
+         <Link to="/orders" className="text-sm font-medium text-slate-600 hover:text-black transition-colors">
            Orders
          </Link>
-         <button onClick={logout} className="text-red-600 hover:underline">
+         <button 
+           onClick={logout} 
+           className="ml-4 text-xs font-semibold px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all text-slate-600"
+         >
            Logout
          </button>
        </div>
-     </div>
+     </nav>
    );
 }
 

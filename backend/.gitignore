@@ -1,0 +1,5 @@
+
+# Logs
+backend/src/utils/logs/
+logs/
+*.log

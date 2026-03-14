@@ -1,5 +1,7 @@
 import cors from "cors";
 import express from "express";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
@@ -8,7 +10,23 @@ import errorHandler from "./middleware/errorMiddleware.js";
 
 const app = express();
 
-app.use(cors());
+// Security Middleware
+app.use(helmet());
+
+// Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: { message: "Too many requests from this IP, please try again after 15 minutes" }
+});
+app.use("/api", limiter);
+
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || "http://localhost:5173", // default vite port
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 //middleware
 app.use(express.json()); //parse json request body

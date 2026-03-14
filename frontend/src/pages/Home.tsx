@@ -6,6 +6,7 @@ type Product = {
   name: string;
   price: number;
   description: string;
+  image: string;
 };
 
 function Home() {
@@ -55,51 +56,72 @@ function Home() {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Products</h1>
-      <input
-        type="text"
-        placeholder="Search products..."
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        className="border p-2 mb-6 w-full rounded"
-      />
+    <main className="max-w-6xl mx-auto px-8 py-12">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <h1 className="text-3xl font-bold tracking-tight">Products</h1>
+        
+        <div className="relative w-full md:w-80">
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            className="w-full bg-slate-50 border border-slate-200 focus:border-black focus:ring-0 px-4 py-2.5 rounded-xl text-sm transition-all"
+          />
+        </div>
+      </div>
 
       {products.length === 0 ? (
-        <p>No products available</p>
+        <div className="text-center py-20 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+          <p className="text-slate-500 font-medium">No products available</p>
+        </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {products.map((p) => (
               <div
                 key={p._id}
-                className="border rounded-lg p-4 shadow-sm hover:shadow-md transition"
+                className="group relative flex flex-col bg-white border border-slate-100 p-4 rounded-3xl hover:border-slate-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300"
               >
-                <h3 className="text-lg font-semibold">{p.name}</h3>
-                <p className="text-gray-600 mt-2 min-h-[40px]">
-                  {p.description}
-                </p>
+                {/* Product Image */}
+                <div className="aspect-square w-full mb-4 overflow-hidden rounded-2xl bg-slate-100">
+                  <img 
+                    src={p.image} 
+                    alt={p.name} 
+                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
 
-                <div className="mt-4 text-xl font-bold">₹{p.price}</div>
+                <div className="flex-1 px-1">
+                  <h3 className="text-lg font-bold text-slate-900 group-hover:text-black transition-colors">{p.name}</h3>
+                  <p className="text-slate-500 text-xs mt-2 leading-relaxed line-clamp-2">
+                    {p.description}
+                  </p>
+                </div>
 
-                <button
-                  onClick={() => addToCart(p._id)}
-                  className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-                >
-                  Add To Cart
-                </button>
+                <div className="mt-6 px-1 flex items-center justify-between">
+                  <span className="text-xl font-extrabold text-slate-900">₹{p.price}</span>
+                  <button
+                    onClick={() => addToCart(p._id)}
+                    className="bg-black text-white text-xs font-bold px-5 py-2.5 rounded-xl hover:bg-slate-800 active:scale-95 transition-all shadow-sm"
+                  >
+                    Add To Cart
+                  </button>
+                </div>
               </div>
             ))}
           </div>
 
           {/* Pagination */}
-          <div className="flex justify-center mt-8 gap-2">
+          <div className="flex justify-center mt-16 items-center gap-1">
             {[...Array(pages).keys()].map((x) => (
               <button
                 key={x + 1}
                 onClick={() => setPage(x + 1)}
-                className={`px-4 py-2 border rounded ${
-                  page === x + 1 ? "bg-black text-white" : "bg-white"
+                className={`w-10 h-10 flex items-center justify-center text-sm font-semibold rounded-xl transition-all ${
+                  page === x + 1 
+                    ? "bg-black text-white" 
+                    : "text-slate-500 hover:bg-slate-100"
                 }`}
               >
                 {x + 1}
@@ -108,7 +130,7 @@ function Home() {
           </div>
         </>
       )}
-    </div>
+    </main>
   );
 }
 
