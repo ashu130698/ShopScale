@@ -47,7 +47,7 @@ export const createProduct = async (req, res) => {
         const { name, description, price, category, stock, image } = req.body;
 
         //basic validation
-        if (!name || !description || !price == null || !category || !image) {
+        if (!name || !description || price == null || !category || !image) {
             return res.status(400).json({ message: "All fields are required" });
         }
         const product = await Product.create({

@@ -41,10 +41,11 @@ export const addToCart = async (req, res) => {
       (item) => item.product.toString() === productId,
     );
 
-    const qty = quantity || 1;
+    const qty = Number(quantity) || 1;
 
     if (itemIndex > -1) {
       cart.items[itemIndex].quantity += qty;
+      cart.markModified("items"); // Ensure Mongoose tracks change in array element
     } else {
       cart.items.push({
         product: productId,

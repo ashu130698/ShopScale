@@ -20,13 +20,17 @@ const protect = async (req, res, next) => {
       ///attach user to request (without password)
       req.user = await User.findById(decoded.userId).select("-password");
 
+      if (!req.user) {
+        return res.status(401).json({ message: "Not Authorized, user not found" });
+      }
+
       return next();
     } catch (error) {
       res.status(401).json({ message: "Not Authorized, token failed" });
     }
   }
   if (!token) {
-    res.status(401).json({ message: "Not Authorized, no token" });
+    return res.status(401).json({ message: "Not Authorized, no token" });
   }
 };
 

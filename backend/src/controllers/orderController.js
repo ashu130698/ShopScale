@@ -13,26 +13,42 @@ export const placeOrder = async (req, res) => {
             return res.status(400).json({ message: "Cart is empty" });
         }
 
-        let totalAmount = 0;
+        // Validate stock for all items before proceeding
+        for (const item of cart.items) {
+            if (item.product.stock < item.quantity) {
+                return res.status(400).json({
+                    message: `Not enough stock for ${item.product.name}. Only ${item.product.stock} left.`
+                });
+            }
+        }
 
-        //build order item snapshot
-        const orderItems = cart.items.map((item) => {
+        let totalAmount = 0;
+        const orderItems = [];
+
+        // Build order item snapshot and update stock
+        for (const item of cart.items) {
             totalAmount += item.product.price * item.quantity;
 
-            return {
+            orderItems.push({
                 product: item.product._id,
                 name: item.product.name,
                 price: item.product.price,
                 quantity: item.quantity,
-            };
-        });
-        //create order
+            });
+
+            // Decrement stock and save the product
+            item.product.stock -= item.quantity;
+            await item.product.save();
+        }
+
+        // Create order
         const order = await Order.create({
             user: req.user._id,
             items: orderItems,
             totalAmount,
         });
-        //clear cart after ordr
+
+        // Clear cart after order
         cart.items = [];
         await cart.save();
 

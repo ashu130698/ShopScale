@@ -47,9 +47,10 @@ function Home() {
       });
 
       alert("Added to cart");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Added to cart failed", error);
-      alert("Could not add item");
+      const message = error.response?.data?.message || "Could not add item";
+      alert(message);
     }
   };
 

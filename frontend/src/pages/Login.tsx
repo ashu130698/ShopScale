@@ -1,9 +1,18 @@
 import api from "../api/axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            navigate("/");
+        }
+    }, [navigate]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -15,7 +24,8 @@ function Login() {
             localStorage.setItem("token", res.data.token);
             console.log("TOKEN:", res.data.token);
             alert("Login successful");
-            window.location.reload();
+            navigate("/");
+            window.location.reload(); // Still helpful to refresh the App state/Navbar
 
         } catch (error) {
             console.error(error);
