@@ -13,15 +13,14 @@ function Register() {
     e.preventDefault();
 
     try {
-      const res = await api.post("/auth/register", {
+      await api.post("/auth/register", {
         name,
         email,
         password,
       });
 
-      //auto login for signup
-      localStorage.setItem("token", res.data.token);
-      navigate("/");
+      alert("Registration successful! Please sign in with your credentials.");
+      navigate("/login");
     } catch (error) {
       console.error("Register failed", error);
       alert("Registration failed (email may already exist)");

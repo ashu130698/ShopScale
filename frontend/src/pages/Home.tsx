@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import { useCart } from "../context/CartContext";
 
 type Product = {
   _id: string;
@@ -15,6 +16,7 @@ function Home() {
   const [pages, setPages] = useState(1);
   const [keyword, setKeyword] = useState("");
   const [debouncedKeyword, setDebouncedKeyword] = useState("");
+  const { refreshCartCount } = useCart();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -47,6 +49,7 @@ function Home() {
         quantity: 1,
       });
 
+      refreshCartCount();
       alert("Added to cart");
     } catch (error: any) {
       console.error("Added to cart failed", error);

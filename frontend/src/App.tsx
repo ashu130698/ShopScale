@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import type { JSX } from "react";
 import Navbar from "./components/Navbar";
 import Register from "./pages/Register";
+import { CartProvider } from "./context/CartContext";
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem("token");
@@ -14,7 +15,7 @@ const PrivateRoute = ({ children }: { children: JSX.Element }) => {
 
 function App() {
   return (
-    <div>
+    <CartProvider>
       <Navbar />
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -47,7 +48,7 @@ function App() {
           }
         />
       </Routes>
-    </div>
+    </CartProvider>
   );
 }
 
