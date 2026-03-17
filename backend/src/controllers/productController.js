@@ -4,28 +4,49 @@ import Product from "../models/product.js";
 /// GET /api/products - list or search products
 export const getProducts = async (req, res) => {
     try {
-        const pageSize = 6;
+        const pageSize = 12; // Increased for better browsing
         const page = Number(req.query.page) || 1;
 
-    const keyword = req.query.keyword
-      ? {
-          name: {
-            $regex: req.query.keyword,
-            $options: "i", // case-insensitive
-          },
-        }
+        // 1. Search by Keyword (Name)
+        const keyword = req.query.keyword
+            ? {
+                  name: {
+                      $regex: req.query.keyword,
+                      $options: "i",
+                  },
+              }
             : {};
-        
-        const count = await Product.countDocuments(keyword);
 
-        const products = await Product.find(keyword)
+        // 2. Filter by Category
+        const category = req.query.category ? { category: req.query.category } : {};
+
+        // 3. Filter by Price Range
+        const minPrice = Number(req.query.minPrice) || 0;
+        const maxPrice = Number(req.query.maxPrice) || Infinity;
+        const priceFilter = {
+            price: { $gte: minPrice, $lte: maxPrice === Infinity ? 1000000 : maxPrice },
+        };
+
+        // Combine all filters
+        const filters = { ...keyword, ...category, ...priceFilter };
+
+        // 4. Sorting logic
+        let sortOptions = { createdAt: -1 }; // Default: Newest first
+        if (req.query.sort === "priceAsc") sortOptions = { price: 1 };
+        if (req.query.sort === "priceDesc") sortOptions = { price: -1 };
+        if (req.query.sort === "oldest") sortOptions = { createdAt: 1 };
+
+        const count = await Product.countDocuments(filters);
+
+        const products = await Product.find(filters)
+            .sort(sortOptions)
             .limit(pageSize)
             .skip(pageSize * (page - 1));
 
-    res.json({products,page,pages: Math.ceil(count / pageSize)});
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+        res.json({ products, page, pages: Math.ceil(count / pageSize), count });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
 ///GET /api/product - Public - single product
