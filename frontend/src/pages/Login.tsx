@@ -42,8 +42,9 @@ function Login() {
 
                 <form onSubmit={handleLogin} className="space-y-5">
                     <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 ml-1">Email Address</label>
+                        <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 ml-1">Email Address</label>
                         <input 
+                            id="email"
                             type="email" 
                             placeholder="name@company.com" 
                             value={email} 
@@ -54,8 +55,9 @@ function Login() {
                     </div>
                     
                     <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 ml-1">Password</label>
+                        <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2 ml-1">Password</label>
                         <input 
+                            id="password"
                             type="password" 
                             placeholder="••••••••" 
                             value={password} 

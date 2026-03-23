@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { useCart } from "../context/CartContext";
+import ProductList from "../components/ProductList";
 
 type Product = {
   _id: string;
@@ -74,64 +75,25 @@ function Home() {
         </div>
       </div>
 
-      {products.length === 0 ? (
-        <div className="text-center py-20 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-          <p className="text-slate-500 font-medium">No products available</p>
+      <ProductList products={products} addToCart={addToCart} />
+
+      {products.length > 0 && (
+        /* Pagination */
+        <div className="flex justify-center mt-16 items-center gap-1">
+          {[...Array(pages).keys()].map((x) => (
+            <button
+              key={x + 1}
+              onClick={() => setPage(x + 1)}
+              className={`w-10 h-10 flex items-center justify-center text-sm font-semibold rounded-xl transition-all ${
+                page === x + 1 
+                  ? "bg-black text-white" 
+                  : "text-slate-500 hover:bg-slate-100"
+              }`}
+            >
+              {x + 1}
+            </button>
+          ))}
         </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((p) => (
-              <div
-                key={p._id}
-                className="group relative flex flex-col bg-white border border-slate-100 p-4 rounded-3xl hover:border-slate-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300"
-              >
-                {/* Product Image */}
-                <div className="aspect-square w-full mb-4 overflow-hidden rounded-2xl bg-slate-100">
-                  <img 
-                    src={p.image} 
-                    alt={p.name} 
-                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-
-                <div className="flex-1 px-1">
-                  <h3 className="text-lg font-bold text-slate-900 group-hover:text-black transition-colors">{p.name}</h3>
-                  <p className="text-slate-500 text-xs mt-2 leading-relaxed line-clamp-2">
-                    {p.description}
-                  </p>
-                </div>
-
-                <div className="mt-6 px-1 flex items-center justify-between">
-                  <span className="text-xl font-extrabold text-slate-900">₹{p.price}</span>
-                  <button
-                    onClick={() => addToCart(p._id)}
-                    className="bg-black text-white text-xs font-bold px-5 py-2.5 rounded-xl hover:bg-slate-800 active:scale-95 transition-all shadow-sm"
-                  >
-                    Add To Cart
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Pagination */}
-          <div className="flex justify-center mt-16 items-center gap-1">
-            {[...Array(pages).keys()].map((x) => (
-              <button
-                key={x + 1}
-                onClick={() => setPage(x + 1)}
-                className={`w-10 h-10 flex items-center justify-center text-sm font-semibold rounded-xl transition-all ${
-                  page === x + 1 
-                    ? "bg-black text-white" 
-                    : "text-slate-500 hover:bg-slate-100"
-                }`}
-              >
-                {x + 1}
-              </button>
-            ))}
-          </div>
-        </>
       )}
     </main>
   );
