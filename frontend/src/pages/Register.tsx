@@ -21,9 +21,10 @@ function Register() {
 
       alert("Registration successful! Please sign in with your credentials.");
       navigate("/login");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Register failed", error);
-      alert("Registration failed (email may already exist)");
+      const message = error.response?.data?.message || "Registration failed. Please check your network connection.";
+      alert(message);
     }
   };
   return (

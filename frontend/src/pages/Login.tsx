@@ -27,9 +27,10 @@ function Login() {
             navigate("/");
             window.location.reload(); // Still helpful to refresh the App state/Navbar
 
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert("Invalid Credentials");
+            const message = error.response?.data?.message || "Login failed. Please check your network connection.";
+            alert(message);
         }
     };
     return (
