@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Mocked } from "vitest";
 import Cart from "../pages/Cart";
 import api from "../api/axios";
 
@@ -7,6 +8,7 @@ import api from "../api/axios";
 //Mock the API module
 vi.mock("../api/axios");
 
+const mockedApi = api as Mocked<typeof api>;
 
 describe("Cart Page", () => {
     beforeEach(() => {
@@ -15,7 +17,7 @@ describe("Cart Page", () => {
 
     it("renders empty state when cart has no items", async () => {
         //Simulate API returning an empty cart
-        (api.get as any).mockResolvedValue({ data: { items: [] } });
+        mockedApi.get.mockResolvedValue({ data: { items: [] } });
 
         render(<Cart />);
 
@@ -34,7 +36,7 @@ describe("Cart Page", () => {
             ],
         };
 
-        (api.get as any).mockResolvedValue({ data: mockCartData });
+        mockedApi.get.mockResolvedValue({ data: mockCartData });
 
         render(<Cart />);
 

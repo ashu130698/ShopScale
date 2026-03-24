@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import axios from "axios";
 import { useCart } from "../context/CartContext";
 import ProductList from "../components/ProductList";
 
@@ -52,9 +53,12 @@ function Home() {
 
       refreshCartCount();
       alert("Added to cart");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Added to cart failed", error);
-      const message = error.response?.data?.message || "Could not add item";
+      let message = "Could not add item";
+      if (axios.isAxiosError(error)) {
+        message = error.response?.data?.message || message;
+      }
       alert(message);
     }
   };
