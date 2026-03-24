@@ -23,7 +23,9 @@ function Cart() {
     const fetchCart = async () => {
       try {
         const res = await api.get("/cart");
-        setCart(res.data);
+        // Filter out items that might have null products (e.g. if a product was deleted)
+        const validItems = res.data.items?.filter((item: any) => item.product !== null) || [];
+        setCart({ ...res.data, items: validItems });
       } catch (error) {
         console.error("Cart error:", error);
       }

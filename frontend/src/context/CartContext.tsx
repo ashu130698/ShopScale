@@ -23,7 +23,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       
       const res = await api.get("/cart");
       const items = res.data.items || [];
-      const total = items.reduce((acc: number, item: any) => acc + item.quantity, 0);
+      // Filter out items that might have null products
+      const validItems = items.filter((item: any) => item.product !== null);
+      const total = validItems.reduce((acc: number, item: any) => acc + item.quantity, 0);
       setCartCount(total);
     } catch (error) {
       console.error("Error refreshing cart count:", error);
