@@ -38,7 +38,16 @@ const corsOptions = {
   credentials: true,
 };
 
-app.use(cors(corsOptions));
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
+
 
 //middleware
 app.use(express.json()); //parse json request body

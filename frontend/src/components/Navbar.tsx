@@ -9,7 +9,6 @@ function Navbar() {
     const logout = () => {
         localStorage.removeItem("token");
         navigate("/login");
-        window.location.reload();
     };
 
     if (!token) return null;

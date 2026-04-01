@@ -25,8 +25,6 @@ function Login() {
             console.log("TOKEN:", res.data.token);
             alert("Login successful");
             navigate("/");
-            window.location.reload(); // Still helpful to refresh the App state/Navbar
-
         } catch (error: any) {
             console.error(error);
             const message = error.response?.data?.message || "Login failed. Please check your network connection.";

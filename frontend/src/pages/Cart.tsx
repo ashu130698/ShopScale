@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import { useCart } from "../context/CartContext";
 
 interface Product {
   _id: string;
@@ -19,28 +20,33 @@ interface CartData {
 function Cart() {
   const [cart, setCart] = useState<CartData | null>(null);
 
-  useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        const res = await api.get("/cart");
-        // Filter out items that might have null products (e.g. if a product was deleted)
-        const validItems = res.data.items?.filter((item: any) => item.product !== null) || [];
-        setCart({ ...res.data, items: validItems });
-      } catch (error) {
-        console.error("Cart error:", error);
-      }
-    };
+  const { refreshCartCount } = useCart();
 
+  const fetchCart = async () => {
+  try {
+    const res = await api.get("/cart");
+    // Filter out items that might have null products (e.g. if a product was deleted)
+    const validItems =
+      res.data.items?.filter((item: any) => item.product !== null) || [];
+    setCart({ ...res.data, items: validItems });
+  } catch (error) {
+    console.error("Cart error:", error);
+  }
+  };
+  
+  useEffect(() => {
     fetchCart();
   }, []);
 
   const placeOrder = async () => {
     try {
       await api.post("/orders");
-      alert("Order placed succesfully");
+      alert("Order placed successfully");
+      await fetchCart();
+      await refreshCartCount();
+
 
       //reload cart after order
-      window.location.reload();
     } catch (error) {
       console.error("Order failed", error);
       alert("Could not place order");
@@ -52,7 +58,9 @@ function Cart() {
 
     try {
       await api.put("/cart", { productId, quantity });
-      window.location.reload();
+      await fetchCart();
+      await refreshCartCount();
+
     } catch (error) {
       console.error("Update failed", error);
     }
@@ -61,7 +69,9 @@ function Cart() {
   const removeItem = async (productId: string) => {
     try {
       await api.delete(`/cart/${productId}`);
-      window.location.reload();
+      await fetchCart();
+      await refreshCartCount();
+
     } catch (error) {
       console.error("Remove failed", error);
     }
