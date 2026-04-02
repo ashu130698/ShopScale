@@ -13,6 +13,17 @@ export const placeOrder = async (req, res) => {
             return res.status(400).json({ message: "Cart is empty" });
         }
 
+        const invalidItems = cart.items.filter((item) => item.product === null);
+
+        if (invalidItems.length > 0) {
+            cart.items = cart.items.filter((item) => item.product !== null);
+            await cart.save();
+
+            return res.status(400).json({
+                message: "Some items in your cart are no longer available. Your cart has been updated.",
+            });
+        }
+
         // Validate stock for all items before proceeding
         for (const item of cart.items) {
             if (item.product.stock < item.quantity) {
