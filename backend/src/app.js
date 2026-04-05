@@ -10,34 +10,15 @@ import errorHandler from "./middleware/errorMiddleware.js";
 
 const app = express();
 
-// Security Middleware
+// Security middleware
 app.use(helmet());
-
-// Rate Limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: { message: "Too many requests from this IP, please try again after 15 minutes" }
-});
-app.use("/api", limiter);
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
+  "http://localhost:5173",
+  "http://localhost:3000",
   "https://shopscale-app.onrender.com",
-  "http://localhost:5173"
 ].filter(Boolean);
-
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-};
-
 
 app.use(
   cors({
@@ -48,37 +29,44 @@ app.use(
   }),
 );
 
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === "production" ? 100 : 10000,
+  message: {
+    message:
+      "Too many requests from this IP, please try again after 15 minutes",
+  },
+});
 
-//middleware
-app.use(express.json()); //parse json request body
+app.use("/api", limiter);
 
-//auth routes
+// middleware
+app.use(express.json());
+
+// auth routes
 app.use("/api/auth", authRoutes);
 
-//Health check route
+// health check route
 app.get("/", (req, res) => {
   res.send("Shopscale API running");
 });
 
-//Product Routes
+// product routes
 app.use("/api/products", productRoutes);
 
-//cart routes
+// cart routes
 app.use("/api/cart", cartRoutes);
 
-//order routes
+// order routes
 app.use("/api/orders", orderRoutes);
 
-// 404 - Route not found (when someone hits a wrong URL)
+// 404
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-// Error handler (catches all errors from routes above)
+// error handler
 app.use(errorHandler);
 
 export default app;
-
-//express.json() is required for POST/PUT
-
-//Health route is useful for quick sanity check

@@ -21,7 +21,7 @@ export const placeOrder = async (req, res) => {
 
             return res.status(400).json({
                 message: "Some items in your cart are no longer available. Your cart has been updated.",
-            });
+            }); 
         }
 
         // Validate stock for all items before proceeding
@@ -33,12 +33,12 @@ export const placeOrder = async (req, res) => {
             }
         }
 
-        let totalAmount = 0;
+        let subtotal = 0;
         const orderItems = [];
 
         // Build order item snapshot and update stock
         for (const item of cart.items) {
-            totalAmount += item.product.price * item.quantity;
+            subtotal += item.product.price * item.quantity;
 
             orderItems.push({
                 product: item.product._id,
@@ -51,6 +51,10 @@ export const placeOrder = async (req, res) => {
             item.product.stock -= item.quantity;
             await item.product.save();
         }
+
+        const shipping = subtotal > 5000 ? 0 : 99;
+        const tax = Math.round(subtotal * 0.18);
+        const totalAmount = subtotal + shipping + tax;
 
         // Create order
         const order = await Order.create({

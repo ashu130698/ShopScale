@@ -41,10 +41,30 @@ export const addToCart = async (req, res) => {
       (item) => item.product.toString() === productId,
     );
 
-    const qty = Number(quantity) || 1;
+    const qty = quantity == null ? 1 : Number(quantity);
+
+    if (!Number.isInteger(qty) || qty < 1) {
+      return res
+        .status(400)
+        .json({ message: "Quantity must be a positive integer" });
+    }
+
+    if (qty > product.stock) {
+      return res.status(400).json({
+        message: `Only ${product.stock} item(s) available for ${product.name}`,
+      });
+    }
 
     if (itemIndex > -1) {
-      cart.items[itemIndex].quantity += qty;
+      const nextQty = cart.items[itemIndex].quantity + qty;
+
+      if (nextQty > product.stock) {
+        return res.status(400).json({
+          message: `Only ${product.stock} item(s) available for ${product.name}`,
+        });
+      }
+
+      cart.items[itemIndex].quantity = nextQty;
       cart.markModified("items"); // Ensure Mongoose tracks change in array element
     } else {
       cart.items.push({
@@ -84,7 +104,27 @@ export const updateCartItem = async (req, res) => {
       return res.status(404).json({ message: "Item not in cart" });
     }
 
-    item.quantity = quantity;
+    const nextQty = Number(quantity);
+
+    if (!Number.isInteger(nextQty) || nextQty < 1) {
+      return res
+        .status(400)
+        .json({ message: "Quantity must be a positive integer" });
+    }
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    if (nextQty > product.stock) {
+      return res.status(400).json({
+        message: `Only ${product.stock} item(s) available for ${product.name}`,
+      });
+    }
+
+    item.quantity = nextQty;
+
     const updatedCart = await cart.save();
     res.json(updatedCart);
   } catch (error) {

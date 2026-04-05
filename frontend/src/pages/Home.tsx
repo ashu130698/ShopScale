@@ -23,6 +23,7 @@ function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedKeyword(keyword);
+      setPage(1);
     }, 500); //wait 500ms after typing stops
 
     return () => clearTimeout(timer);
@@ -67,7 +68,7 @@ function Home() {
     <main className="max-w-6xl mx-auto px-8 py-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <h1 className="text-3xl font-bold tracking-tight">Products</h1>
-        
+
         <div className="relative w-full md:w-80">
           <input
             type="text"
@@ -89,8 +90,8 @@ function Home() {
               key={x + 1}
               onClick={() => setPage(x + 1)}
               className={`w-10 h-10 flex items-center justify-center text-sm font-semibold rounded-xl transition-all ${
-                page === x + 1 
-                  ? "bg-black text-white" 
+                page === x + 1
+                  ? "bg-black text-white"
                   : "text-slate-500 hover:bg-slate-100"
               }`}
             >
