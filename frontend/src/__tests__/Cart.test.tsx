@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Mocked } from "vitest";
 import Cart from "../pages/Cart";
 import api from "../api/axios";
+import { CartProvider } from "../context/CartContext";
 
 
 //Mock the API module
@@ -19,7 +20,12 @@ describe("Cart Page", () => {
         //Simulate API returning an empty cart
         mockedApi.get.mockResolvedValue({ data: { items: [] } });
 
-        render(<Cart />);
+        render(
+          <CartProvider>
+            <Cart />
+          </CartProvider>,
+        );
+
 
         //Assert empty state message appears
         const emptyMsg = await screen.findByText(/Your shopping bag is empty/i);
@@ -38,7 +44,12 @@ describe("Cart Page", () => {
 
         mockedApi.get.mockResolvedValue({ data: mockCartData });
 
-        render(<Cart />);
+        render(
+          <CartProvider>
+            <Cart />
+          </CartProvider>,
+        );
+
 
         //Verify item name appears
         expect(await screen.findByText("Headphones")).toBeInTheDocument();

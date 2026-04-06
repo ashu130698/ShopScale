@@ -21,8 +21,14 @@ describe("ProductList Component", () => {
         },
     ];
 
+    it("renders empty state when no products are available", () => {
+      render(<ProductList products={[]} addToCart={vi.fn()} />);
+      expect(screen.getByText(/No products available/i)).toBeInTheDocument();
+    });
+
     it("renders the list of products passed via props", () => {
-        render(<ProductList products={ mockProducts } addToCart={vi.fn()} />);
+        render(<ProductList products={mockProducts} addToCart={vi.fn()} />);
+
     
     //Assert that products names appear on screen
     expect(screen.getByText("Modern Chair")).toBeInTheDocument();
