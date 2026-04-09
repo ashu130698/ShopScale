@@ -11,5 +11,10 @@ export default defineConfig({
     pool: "threads",
     maxWorkers: 1,
     fileParallelism: false,
+    poolOptions: {
+      threads: {
+        singleThread: true,
+      },
+    },
   },
 });

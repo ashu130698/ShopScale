@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Mocked } from "vitest";
 import Cart from "../pages/Cart";
@@ -53,5 +54,36 @@ describe("Cart Page", () => {
 
         //Verify item name appears
         expect(await screen.findByText("Headphones")).toBeInTheDocument();
+    });
+
+    it("sends the updated quantity when the increment button is clicked", async () => {
+        const user = userEvent.setup();
+        const mockCartData = {
+            items: [
+                {
+                    product: { _id: "1", name: "Headphones", price: 1000 },
+                    quantity: 2,
+                },
+            ],
+        };
+
+        mockedApi.get.mockResolvedValue({ data: mockCartData });
+        mockedApi.put.mockResolvedValue({ data: mockCartData });
+
+        render(
+          <CartProvider>
+            <Cart />
+          </CartProvider>,
+        );
+
+        await screen.findByText("Headphones");
+        await user.click(screen.getByRole("button", { name: "+" }));
+
+        await waitFor(() => {
+            expect(mockedApi.put).toHaveBeenCalledWith("/cart", {
+                productId: "1",
+                quantity: 3,
+            });
+        });
     });
 });
