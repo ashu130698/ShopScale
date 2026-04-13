@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
-import { useCart } from "../context/CartContext";
+import { getErrorMessage } from "../api/getErrorMessage";
+import { useCart } from "../context/cart-context";
 
 interface Product {
   _id: string;
@@ -9,13 +10,22 @@ interface Product {
 }
 
 interface CartItem {
-  product: Product;
+  product: Product | null;
   quantity: number;
 }
 
 interface CartData {
   items: CartItem[];
 }
+
+const getValidCart = async () => {
+  const res = await api.get<CartData>("/cart");
+  const items = res.data.items?.filter(
+    (item): item is { product: Product; quantity: number } => item.product !== null,
+  ) || [];
+
+  return { ...res.data, items };
+};
 
 function Cart() {
   const [cart, setCart] = useState<CartData | null>(null);
@@ -24,18 +34,33 @@ function Cart() {
 
   const fetchCart = async () => {
     try {
-      const res = await api.get("/cart");
-      // Filter out items that might have null products (e.g. if a product was deleted)
-      const validItems =
-        res.data.items?.filter((item: any) => item.product !== null) || [];
-      setCart({ ...res.data, items: validItems });
+      const nextCart = await getValidCart();
+      setCart(nextCart);
     } catch (error) {
       console.error("Cart error:", error);
     }
   };
 
   useEffect(() => {
-    fetchCart();
+    let isMounted = true;
+
+    const loadCart = async () => {
+      try {
+        const nextCart = await getValidCart();
+
+        if (isMounted) {
+          setCart(nextCart);
+        }
+      } catch (error) {
+        console.error("Cart error:", error);
+      }
+    };
+
+    void loadCart();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const placeOrder = async () => {
@@ -46,9 +71,9 @@ function Cart() {
       await refreshCartCount();
 
       //reload cart after order
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Order failed", error);
-      const message = error.response?.data?.message || "Could not place order";
+      const message = getErrorMessage(error, "Could not place order");
       alert(message);
     }
   };

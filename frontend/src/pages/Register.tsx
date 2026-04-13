@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import { getErrorMessage } from "../api/getErrorMessage";
 
 function Register() {
   const navigate = useNavigate();
@@ -21,9 +22,12 @@ function Register() {
 
       alert("Registration successful! Please sign in with your credentials.");
       navigate("/login");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Register failed", error);
-      const message = error.response?.data?.message || "Registration failed. Please check your network connection.";
+      const message = getErrorMessage(
+        error,
+        "Registration failed. Please check your network connection.",
+      );
       alert(message);
     }
   };

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import axios from "axios";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/cart-context";
 import ProductList from "../components/ProductList";
 
 type Product = {

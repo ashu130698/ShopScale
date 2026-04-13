@@ -86,4 +86,32 @@ describe("Cart Page", () => {
             });
         });
     });
+
+    it("removes an item when the remove button is clicked", async () => {
+        const user = userEvent.setup();
+        const mockCartData = {
+            items: [
+                {
+                    product: { _id: "1", name: "Headphones", price: 1000 },
+                    quantity: 2,
+                },
+            ],
+        };
+
+        mockedApi.get.mockResolvedValue({ data: mockCartData });
+        mockedApi.delete.mockResolvedValue({ data: { items: [] } });
+
+        render(
+          <CartProvider>
+            <Cart />
+          </CartProvider>,
+        );
+
+        await screen.findByText("Headphones");
+        await user.click(screen.getByTitle("Remove item"));
+
+        await waitFor(() => {
+            expect(mockedApi.delete).toHaveBeenCalledWith("/cart/1");
+        });
+    });
 });

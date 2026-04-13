@@ -8,13 +8,8 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: "./src/setupTests.ts",
-    pool: "threads",
+    pool: "forks",
     maxWorkers: 1,
     fileParallelism: false,
-    poolOptions: {
-      threads: {
-        singleThread: true,
-      },
-    },
   },
 });

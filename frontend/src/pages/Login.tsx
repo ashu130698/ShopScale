@@ -1,4 +1,5 @@
 import api from "../api/axios";
+import { getErrorMessage } from "../api/getErrorMessage";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -25,9 +26,12 @@ function Login() {
             console.log("TOKEN:", res.data.token);
             alert("Login successful");
             navigate("/");
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            const message = error.response?.data?.message || "Login failed. Please check your network connection.";
+            const message = getErrorMessage(
+              error,
+              "Login failed. Please check your network connection.",
+            );
             alert(message);
         }
     };

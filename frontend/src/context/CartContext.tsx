@@ -1,32 +1,46 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import api from "../api/axios";
+import { CartContext } from "./cart-context";
 
-
-interface CartContextType {
-  cartCount: number;
-  refreshCartCount: () => Promise<void>;
+interface CartProduct {
+  _id: string;
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+interface CartItem {
+  product: CartProduct | null;
+  quantity: number;
+}
+
+interface CartResponse {
+  items?: CartItem[];
+}
+
+const getCartCount = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    return 0;
+  }
+
+  const res = await api.get<CartResponse>("/cart");
+  const items = res.data.items || [];
+
+  return items.reduce((acc, item) => {
+    if (!item.product) {
+      return acc;
+    }
+
+    return acc + item.quantity;
+  }, 0);
+};
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartCount, setCartCount] = useState(0);
 
   const refreshCartCount = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setCartCount(0);
-        return;
-      }
-      
-      const res = await api.get("/cart");
-      const items = res.data.items || [];
-      // Filter out items that might have null products
-      const validItems = items.filter((item: any) => item.product !== null);
-      const total = validItems.reduce((acc: number, item: any) => acc + item.quantity, 0);
-      setCartCount(total);
+      const nextCount = await getCartCount();
+      setCartCount(nextCount);
     } catch (error) {
       console.error("Error refreshing cart count:", error);
       setCartCount(0);
@@ -34,7 +48,29 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    refreshCartCount();
+    let isMounted = true;
+
+    const syncCartCount = async () => {
+      try {
+        const nextCount = await getCartCount();
+
+        if (isMounted) {
+          setCartCount(nextCount);
+        }
+      } catch (error) {
+        console.error("Error refreshing cart count:", error);
+
+        if (isMounted) {
+          setCartCount(0);
+        }
+      }
+    };
+
+    void syncCartCount();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
@@ -42,12 +78,4 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </CartContext.Provider>
   );
-};
-
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (context === undefined) {
-    throw new Error("useCart must be used within a CartProvider");
-  }
-  return context;
 };
