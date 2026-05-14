@@ -1,34 +1,41 @@
 
 import Product from "../models/product.js";
 
+const escapeRegex = (value = "") =>
+    value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 /// GET /api/products - list or search products
 export const getProducts = async (req, res) => {
     try {
-        const pageSize = 12; // Increased for better browsing
-        const page = Number(req.query.page) || 1;
+        const pageSize = Math.min(Math.max(Number(req.query.pageSize) || 12, 1), 24);
+        const page = Math.max(Number(req.query.page) || 1, 1);
+        const keyword = String(req.query.keyword || "").trim().toLowerCase();
+        const category = String(req.query.category || "").trim();
+        const minPrice = Number(req.query.minPrice);
+        const maxPrice = Number(req.query.maxPrice);
+        const filters = {};
 
-        // 1. Search by Keyword (Name)
-        const keyword = req.query.keyword
-            ? {
-                  name: {
-                      $regex: req.query.keyword,
-                      $options: "i",
-                  },
-              }
-            : {};
+        if (keyword) {
+            filters.nameLower = {
+                $regex: `^${escapeRegex(keyword)}`,
+            };
+        }
 
-        // 2. Filter by Category
-        const category = req.query.category ? { category: req.query.category } : {};
+        if (category) {
+            filters.category = category;
+        }
 
-        // 3. Filter by Price Range
-        const minPrice = Number(req.query.minPrice) || 0;
-        const maxPrice = Number(req.query.maxPrice) || Infinity;
-        const priceFilter = {
-            price: { $gte: minPrice, $lte: maxPrice === Infinity ? 1000000 : maxPrice },
-        };
+        if (Number.isFinite(minPrice) || Number.isFinite(maxPrice)) {
+            filters.price = {};
 
-        // Combine all filters
-        const filters = { ...keyword, ...category, ...priceFilter };
+            if (Number.isFinite(minPrice)) {
+                filters.price.$gte = minPrice;
+            }
+
+            if (Number.isFinite(maxPrice)) {
+                filters.price.$lte = maxPrice;
+            }
+        }
 
         // 4. Sorting logic
         let sortOptions = { createdAt: -1 }; // Default: Newest first
@@ -36,12 +43,15 @@ export const getProducts = async (req, res) => {
         if (req.query.sort === "priceDesc") sortOptions = { price: -1 };
         if (req.query.sort === "oldest") sortOptions = { createdAt: 1 };
 
-        const count = await Product.countDocuments(filters);
-
-        const products = await Product.find(filters)
-            .sort(sortOptions)
-            .limit(pageSize)
-            .skip(pageSize * (page - 1));
+        const [count, products] = await Promise.all([
+            Product.countDocuments(filters),
+            Product.find(filters)
+                .select("name description price category stock image createdAt")
+                .sort(sortOptions)
+                .limit(pageSize)
+                .skip(pageSize * (page - 1))
+                .lean(),
+        ]);
 
         res.json({ products, page, pages: Math.ceil(count / pageSize), count });
     } catch (error) {

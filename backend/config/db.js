@@ -11,6 +11,10 @@ const connectDB = async () => {
     )}@${DB_HOST}/${DB_NAME}`;
 
     await mongoose.connect(uri);
+    await mongoose.connection.collection("products").updateMany(
+      { nameLower: { $exists: false } },
+      [{ $set: { nameLower: { $toLower: "$name" } } }],
+    );
 
     //short explanation
     logger.info("MongoDB connected successfully");

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-import { type } from "os";
+
+const normalizeProductName = (value = "") => value.trim().toLowerCase();
 
 ///product schema for e-commerce items
 const productSchema = new mongoose.Schema({
@@ -7,6 +8,12 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true, //remove extra spaces
+    },
+
+    nameLower: {
+        type: String,
+        required: true,
+        select: false,
     },
 
     description: {
@@ -43,6 +50,29 @@ const productSchema = new mongoose.Schema({
     }
 
 );
+
+productSchema.index({ nameLower: 1 });
+productSchema.index({ category: 1, price: 1 });
+productSchema.index({ category: 1, createdAt: -1 });
+productSchema.index({ createdAt: -1 });
+
+productSchema.pre("validate", function (next) {
+    if (this.name) {
+        this.nameLower = normalizeProductName(this.name);
+    }
+
+    next();
+});
+
+productSchema.pre("insertMany", function (next, docs) {
+    docs.forEach((doc) => {
+        if (doc.name) {
+            doc.nameLower = normalizeProductName(doc.name);
+        }
+    });
+
+    next();
+});
 
 const Product = mongoose.model("Product", productSchema);
 
