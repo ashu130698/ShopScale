@@ -39,9 +39,9 @@ describe("Login Component", () => {
 
   it("shows the backend error message when login fails", async () => {
     const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
-    const mockedApi = vi.mocked(api);
+    const mockedPost = vi.mocked(api.post);
 
-    mockedApi.post.mockRejectedValueOnce({
+    mockedPost.mockRejectedValueOnce({
       response: {
         data: { message: "Invalid Credentials" },
       },

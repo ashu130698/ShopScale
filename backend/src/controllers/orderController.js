@@ -1,5 +1,6 @@
 import Cart from "../models/cart.js"
 import Order from "../models/order.js";
+import Product from "../models/product.js";
 
 // POST /api/order - place  order
 export const placeOrder = async (req, res) => {
@@ -47,9 +48,10 @@ export const placeOrder = async (req, res) => {
                 quantity: item.quantity,
             });
 
-            // Decrement stock and save the product
-            item.product.stock -= item.quantity;
-            await item.product.save();
+            await Product.updateOne(
+                { _id: item.product._id },
+                { $inc: { stock: -item.quantity } },
+            );
         }
 
         const shipping = subtotal > 5000 ? 0 : 99;

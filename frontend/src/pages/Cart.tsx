@@ -18,6 +18,15 @@ interface CartData {
   items: CartItem[];
 }
 
+interface ValidCartItem {
+  product: Product;
+  quantity: number;
+}
+
+interface ValidCartData {
+  items: ValidCartItem[];
+}
+
 const getValidCart = async () => {
   const res = await api.get<CartData>("/cart");
   const items = res.data.items?.filter(
@@ -28,7 +37,7 @@ const getValidCart = async () => {
 };
 
 function Cart() {
-  const [cart, setCart] = useState<CartData | null>(null);
+  const [cart, setCart] = useState<ValidCartData | null>(null);
 
   const { refreshCartCount } = useCart();
 
