@@ -6,8 +6,10 @@ const baseURL =
     ? "https://shopscale-api.onrender.com/api"
     : "http://localhost:4000/api");
 
-console.log("Current Hostname:", window.location.hostname);
-console.log("Resolved API Base URL:", baseURL);
+if (import.meta.env.DEV) {
+  console.log("Current Hostname:", window.location.hostname);
+  console.log("Resolved API Base URL:", baseURL);
+}
 
 const api = axios.create({
   baseURL,

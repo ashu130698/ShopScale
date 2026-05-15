@@ -23,7 +23,6 @@ function Login() {
 
             //store token
             localStorage.setItem("token", res.data.token);
-            console.log("TOKEN:", res.data.token);
             alert("Login successful");
             navigate("/");
         } catch (error: unknown) {
